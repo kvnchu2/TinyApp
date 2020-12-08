@@ -13,7 +13,14 @@ const urlDatabase = {
 };
 
 function generateRandomString() {
+  var text = "";
 
+  var charset = "abcdefghijklmnopqrstuvwxyz0123456789";
+
+  for( var i=0; i < 6; i++ )
+      text += charset.charAt(Math.floor(Math.random() * charset.length));
+
+  return text;
 }
 
 
@@ -22,12 +29,20 @@ app.get("/", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  console.log(req.body);
+  const shortKey = generateRandomString();
+  urlDatabase[shortKey]= req.body.longURL; 
+   // Log the POST request body to the console
+  res.redirect(`/urls/${shortKey}`);        // Respond with 'Ok' (we will replace this)
 });
 
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
+});
+
+app.get("/u/:shortURL", (req, res) => {
+  const longURL = urlDatabase[req.params.shortURL];
+  res.redirect(longURL);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
