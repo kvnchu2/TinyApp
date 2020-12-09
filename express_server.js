@@ -14,6 +14,25 @@ const urlDatabase  = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}
+
+function createObj(ke, val) {
+  const newObj = {};
+  newObj[ke] = val;
+  return newObj;
+}
+
 function generateRandomString() {
   var text = "";
 
@@ -58,7 +77,9 @@ app.get("/urls.json", (req, res) => {
 
 //renders urls_index page with long and short urls
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies["username"]};
+  const user_id = req.cookies['user_id'];
+  const templateVars = { urls: urlDatabase, user: users[user_id]};
+  console.log(templateVars);
   res.render("urls_index", templateVars);
 });
 
@@ -67,9 +88,29 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
+app.get("/register", (req, res) => {
+  const templateVars = { urls: urlDatabase, username: req.cookies["username"]};
+  res.render("urls_register", templateVars);
+})
+
+
+
+
+app.post("/register", (req, res) => {
+  const userID = generateRandomString();
+  users[userID] = createObj('id', userID);
+  users[userID]['email'] = req.body.email;
+  users[userID]['password'] = req.body.password;
+  console.log(users);
+  res.cookie('user_id', userID);
+  res.cookie('email',req.body.email);
+  res.redirect('/urls');
+})
+
+
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect('/urls');
 })
 
