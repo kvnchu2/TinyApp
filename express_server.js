@@ -9,9 +9,9 @@ app.set("view engine", "ejs");
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
-const urlDatabase  = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+const urlDatabase = {
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
+  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
 };
 
 const users = { 
@@ -66,6 +66,28 @@ function obtainID(email) {
   }
 }
 
+//used for getting the urls for user id
+function urlsForUser(id) {
+  let userObj = {};
+  for (let user in urlDatabase) {
+    if (urlDatabase[user]['userID'] === id) {
+      userObj[user] = urlDatabase[user]['longURL'];
+    }
+  }
+  return userObj;
+}
+
+//used for validating if user is owner of shortURL
+function isOwner(shortURL, userID){
+  if (urlDatabase[shortURL]['userID'] === userID) {
+    return true;
+  }
+  return false;
+}
+
+
+
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -75,19 +97,25 @@ app.get("/", (req, res) => {
 //renders urls_new page
 app.get("/urls/new", (req, res) => {
   const user_id = req.cookies['user_id'];
+  if (typeof user_id === 'undefined') {
+    res.redirect('/login');
+  } else {
   const templateVars = {user: users[user_id]}
   res.render("urls_new", templateVars);
+  }
 });
 
 //redirects user to longURL via hyperlink
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
+  const longURL = urlDatabase[req.params.shortURL]['longURL'];
   res.redirect(longURL);
 });
 
 //renders urls_show page displaying short and long urls
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], user: users[user_id]};
+  const user_id = req.cookies['user_id'];
+  const isOwnerVar = isOwner(req.params.shortURL, user_id);
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]['longURL'], user: users[user_id], owner: isOwnerVar};
   res.render("urls_show", templateVars);
 });
 
@@ -99,7 +127,9 @@ app.get("/urls.json", (req, res) => {
 //renders urls_index page with long and short urls
 app.get("/urls", (req, res) => {
   const user_id = req.cookies['user_id'];
-  const templateVars = { urls: urlDatabase, user: users[user_id]};
+  const newUrlDatabase = urlsForUser(user_id);
+  const templateVars = { urls: newUrlDatabase, user: users[user_id]};
+  console.log(newUrlDatabase);
   res.render("urls_index", templateVars);
 });
 
@@ -155,25 +185,40 @@ app.post("/login", (req, res) => {
 })
 
 app.post("/urls/:shortURL/delete", (req, res) => {
+  const user_id = req.cookies['user_id'];
+  const newUrlDatabase = urlsForUser(user_id);
+  if (urlDatabase[req.params.shortURL]['userID'] === user_id) {
   delete urlDatabase[req.params.shortURL];
-  console.log(req);
+  console.log(urlDatabase);
   res.redirect(`/urls`);
+  } else {
+    return res.status(511).send('You do not have permission to delete');
+  }
 })
 
 
 //after user inputs url into edit field, they are redirected to urls_show
 app.post("/urls/:id", (req, res) => {
+  const user_id = req.cookies['user_id'];
+  const newUrlDatabase = urlsForUser(user_id);
+  if (urlDatabase[req.params.id]['userID'] === user_id) {
   const longURL = req.body.longURL;
   const shortURL = req.params.id;
-  urlDatabase[shortURL] = longURL;
+  urlDatabase[shortURL].longURL = longURL;
+  console.log(urlDatabase)
   res.redirect("/urls")
+  } else {
+    return res.status(511).send('You do not have permission to edit');
+  }
 })
 
-//after user inputs url, they are redirected to urls_show
+//after user inputs url, they are redirected to urls_index
 app.post("/urls", (req, res) => {
-  console.log(req.body);
+  const user_id = req.cookies['user_id']
   const shortURL = generateRandomString();
-  urlDatabase[shortURL]= req.body.longURL; 
+  urlDatabase[shortURL]= createObj('longURL',req.body.longURL); 
+  urlDatabase[shortURL]['userID'] = user_id;
+  console.log(urlDatabase);
    // Log the POST request body to the console
   res.redirect(`/urls/${shortURL}`);        
 });
