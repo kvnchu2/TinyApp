@@ -44,6 +44,15 @@ function generateRandomString() {
   return text;
 }
 
+function checkEmail(email) {
+  const usersArr = Object.keys(users);
+  for (let user of usersArr) {
+    if (users[user]['email'] === email){
+      return true;
+    } 
+  }
+  return false;
+}
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -53,7 +62,8 @@ app.get("/", (req, res) => {
 
 //renders urls_new page
 app.get("/urls/new", (req, res) => {
-  const templateVars = {username: req.cookies["username"]}
+  const user_id = req.cookies['user_id'];
+  const templateVars = {user: users[user_id]}
   res.render("urls_new", templateVars);
 });
 
@@ -65,7 +75,7 @@ app.get("/u/:shortURL", (req, res) => {
 
 //renders urls_show page displaying short and long urls
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: req.cookies["username"]};
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], user: users[user_id]};
   console.log(templateVars);
   res.render("urls_show", templateVars);
 });
@@ -89,7 +99,7 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies["username"]};
+  const templateVars = { urls: urlDatabase};
   res.render("urls_register", templateVars);
 })
 
@@ -97,14 +107,19 @@ app.get("/register", (req, res) => {
 
 
 app.post("/register", (req, res) => {
+  if (req.body.email === '' || req.body.password === '') {
+    return res.status(400).send('input fields are blank');
+  } else if (checkEmail(req.body.email)) {
+    return res.status(400).send('email already exists!');
+  } else {
   const userID = generateRandomString();
   users[userID] = createObj('id', userID);
   users[userID]['email'] = req.body.email;
   users[userID]['password'] = req.body.password;
-  console.log(users);
   res.cookie('user_id', userID);
-  res.cookie('email',req.body.email);
+  console.log(users);
   res.redirect('/urls');
+  }
 })
 
 
@@ -133,11 +148,6 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect(`/urls`);
 })
 
-//redirects to urls_show page from edit button on urls_index
-// app.post("/urls/:shortURL/edit", (req, res) => {
-//   const theShortUrl = req.params.shortURL
-//   res.redirect(`/urls/${theShortUrl}`)
-// })
 
 //after user inputs url into edit field, they are redirected to urls_show
 app.post("/urls/:id", (req, res) => {
