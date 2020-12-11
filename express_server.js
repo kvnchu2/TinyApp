@@ -235,7 +235,6 @@ app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = createObj('longURL',req.body.longURL); 
   urlDatabase[shortURL]['userID'] = user_id;
-  // Log the POST request body to the console
   res.redirect(`/urls/${shortURL}`);        
 });
 
