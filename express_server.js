@@ -51,9 +51,9 @@ function generateRandomString() {
 
   const charset = "abcdefghijklmnopqrstuvwxyz0123456789";
 
-  for( let i = 0; i < 6; i++)
+  for (let i = 0; i < 6; i++){
     text += charset.charAt(Math.floor(Math.random() * charset.length));
-
+  }
   return text;
 }
 
@@ -92,7 +92,12 @@ function isOwner(shortURL, userID) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~GET ROUTES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //home page
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  const user_id = req.session['user_id'];
+  if (typeof user_id === 'undefined') {
+    res.redirect('/login');
+  } else {
+    res.redirect('urls');
+  }
 });
 
 //renders urls_new page
@@ -140,13 +145,23 @@ app.get("/hello", (req, res) => {
 
 //displays register page
 app.get("/register", (req, res) => {
-  const templateVars = { urls: urlDatabase};
-  res.render("urls_register", templateVars);
+  const user_id = req.session['user_id'];
+  if (typeof user_id === 'undefined'){
+    const templateVars = { urls: urlDatabase};
+    res.render("urls_register", templateVars);
+  } else {
+    res.redirect('/urls');
+  }
 });
 
 //displays login page
 app.get("/login", (req, res) => {
-  res.render("login");
+  const user_id = req.session['user_id'];
+  if (typeof user_id === 'undefined'){
+    res.render("login");
+  } else {
+    res.redirect('/urls');
+  }
 });
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~POST ROUTES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
