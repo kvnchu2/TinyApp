@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { urlDatabase, users, isOwner, urlsForUser, generateRandomString, createObj } = require('../helpers.js');
+const { urlDatabase, generateRandomString } = require('../helpers.js');
 const Url = require('../models/Url');
 
 module.exports = () => {
@@ -95,15 +95,17 @@ module.exports = () => {
   //after user inputs url into edit field, they are redirected to urls_show
   router.post("/urls/:id", (req, res) => {
     const user_id = req.session['user_id'];
-    const newUrlDatabase = urlsForUser(user_id);
-    if (urlDatabase[req.params.id]['userID'] === user_id) {
-      const longURL = req.body.longURL;
-      const shortURL = req.params.id;
-      urlDatabase[shortURL].longURL = longURL;
-      res.redirect("/urls");
-    } else {
-      return res.status(511).send('You do not have permission to edit');
-    }
+
+    const urlEdit = Url.find({"userID": user_id, "shortURL": req.params.id});
+    urlEdit.exec().then((data) => {
+      if (data.length > 0) {
+        const urlChange = Url.updateOne({"userID": user_id, "shortURL": req.params.id}, {"longURL": req.body.longURL});
+        urlChange.exec();
+        res.redirect("/urls");
+      } else {
+        return res.status(511).send('You do not have permission to edit');
+      }
+    });
   });
   
   //after user inputs url, they are redirected to urls_index
