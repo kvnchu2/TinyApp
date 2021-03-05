@@ -2,6 +2,10 @@ const express = require("express");
 const app = express();
 const PORT = 8081; // default port 8080
 const cookieSession = require('cookie-session');
+const connectDB = require('./db/Connection');
+const mongoose = require("mongoose");
+require('dotenv/config');
+
 
 app.set("view engine", "ejs");
 
@@ -16,6 +20,10 @@ app.use(cookieSession({
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
 
+connectDB();
+
+
+app.use(express.json({extended: false}));
 // seperated routes
 const login = require("./routes/login");
 const register = require("./routes/register");
@@ -24,6 +32,7 @@ const urls = require("./routes/urls");
 app.use("/", login());
 app.use("/", register());
 app.use("/", urls());
+
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
