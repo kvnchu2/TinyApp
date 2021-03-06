@@ -1,6 +1,7 @@
 const router = require("express").Router();
-const { urlDatabase, generateRandomString } = require('../helpers.js');
+const { generateRandomString } = require('../helpers.js');
 const Url = require('../models/Url');
+const User = require('../models/User');
 
 module.exports = () => {
   //home page
@@ -57,19 +58,27 @@ module.exports = () => {
 
   //renders urls_index page with long and short urls
   router.get("/urls", (req, res) => {
-    if (!req.session['user_id']) {
-      const templateVars = {user: 'undefined'};
-      res.render("urls_index", templateVars);
+    if (req.session['user_id'] === undefined) {
+      res.render("urls_index");
     } else if (req.session['user_id']) {
-      const urlFind = Url.find({"userID": req.session['user_id']});
-      urlFind.exec().then((data) => {
-        let urlDatabase = {};
-        data.forEach(x => urlDatabase[x.shortURL] = x.longURL);
-        const templateVars = {urls: urlDatabase, user: req.session['user_id']};
+      const userFind = User.aggregate([
+        {
+          $lookup:
+            {
+              from: "urls",
+              localField: "id",
+              foreignField: "userID",
+              as: "url_docs"
+            }
+        }
+      ]);
+      userFind.exec().then((data) => {
+        const url = data.filter(x => x['id'] === req.session['user_id'])[0].url_docs;
+        const userInfo = data.filter(x => x['id'] === req.session['user_id'])[0];
+        const templateVars = { urls: url, user: userInfo};
         res.render("urls_index", templateVars);
-      }).catch((err) => {
-        console.log(err);
       });
+
     }
 
   });
