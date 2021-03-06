@@ -7,7 +7,8 @@ module.exports = () => {
   router.get("/login", (request, response) => {
     const user_id = request.session['user_id'];
     if (typeof user_id === 'undefined') {
-      response.render("login");
+      const templateVars = { warning: "none"};
+      response.render("login", templateVars);
     } else {
       response.redirect('/urls');
     }
@@ -19,9 +20,11 @@ module.exports = () => {
     const user = User.find({"email": req.body.email});
     user.exec().then((data) => {
       if (data.length < 1) {
-        return res.status(403).send('forbidden');
+        const templateVars = { warning: "invalid"};
+        res.render('login', templateVars);
       } else if (data.length > 0 && !bcrypt.compareSync(req.body.password, data[0].password)) {
-        return res.status(403).send('password does not match');
+        const templateVars = { warning: "password"};
+        res.render('login', templateVars);
       } else if (data.length > 0 && bcrypt.compareSync(req.body.password, data[0].password)) {
         req.session['user_id'] = data[0].id;
         res.redirect('/urls');

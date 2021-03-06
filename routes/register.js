@@ -8,7 +8,8 @@ module.exports = () => {
   router.get("/register", (request, response) => {
     const user_id = request.session['user_id'];
     if (typeof user_id === 'undefined') {
-      response.render("urls_register");
+      const templateVars = { warning: "none"};
+      response.render("urls_register", templateVars);
     } else {
       response.redirect('/urls');
     }
@@ -20,9 +21,11 @@ module.exports = () => {
     const user = User.find({"email": req.body.email});
     user.exec().then((data) => {
       if (data.length > 0) {
-        return res.status(400).send('email already exists!');
+        const templateVars = { warning: "exists"};
+        res.render('urls_register', templateVars);
       } else if (req.body.email === '' || req.body.password === '') {
-        return res.status(400).send('input fields are blank');
+        const templateVars = { warning: "input"};
+        res.render('urls_register', templateVars);
       } else {
         const userID = generateRandomString();
         req.session['user_id'] = userID;
@@ -32,8 +35,6 @@ module.exports = () => {
         users.id = userID;
         users.email = email;
         users.password = bcrypt.hashSync(password, 10);
-      
-
         let usersModel = new User(users);
         usersModel.save();
         res.redirect('/urls');

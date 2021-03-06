@@ -14,3 +14,17 @@
   flex-direction: column;
   margin-top: 20px;
 }
+
+#exists {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+#input {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}

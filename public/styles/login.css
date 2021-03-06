@@ -14,3 +14,17 @@
   flex-direction: column;
   margin-top: 20px;
 }
+
+#invalid {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+#password {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}

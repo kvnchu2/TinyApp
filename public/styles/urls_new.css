@@ -1,0 +1,20 @@
+#create-main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-top: 100px;
+}
+
+#create-main h3 {
+  padding-bottom: 20px;
+}
+
+#create-form {
+  display: flex;
+  flex-direction: column
+}
+
+#create-form button{
+  margin-top: 20px;
+}

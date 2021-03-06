@@ -4,17 +4,21 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="stylesheet" href="../styles/header.css" type="text/css">
+  <link rel="stylesheet" href="../styles/urls_index.css" type="text/css">
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <title>TinyApp</title>
 </head>
 <body>
   <%- include('partials/_header') %>
-  <main style="margin: 1em;">
-    <h3>My URLs</h3>
+  <main class="main-container" style="margin: 1em;">
     <% if (typeof user === 'undefined') { %>
-      <p>Please login or register.</p>
+    <div class="no-authorization">
+      <img src="https://cdn.pixabay.com/photo/2012/04/01/18/03/policeman-23796_960_720.png">
+      <p>Please <a href="http://localhost:8081/login">login</a> or <a href="http://localhost:8081/register">register</a>.</p>
+    </div>
     <% } else { %>
+    <h3>My URLs</h3>
     <table class="table">
       <thead>
         <tr>

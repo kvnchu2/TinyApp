@@ -14,7 +14,16 @@
   <body>
 
     <%- include('partials/_header') %>
-
+    <% if (warning === "exists") {%>
+      <div id="exists" class="alert alert-danger" role="alert">
+        Email already exists!
+      </div>
+    <% } %>
+    <% if (warning === "input") {%>
+      <div id="input" class="alert alert-danger" role="alert">
+        Input fields are blank!
+      </div>
+    <% } %>
     <form id="register-form" class="form-inline" action="/register" method="POST">
       <h1>Create Account</h1>
       <div class="form-group mb-2">
