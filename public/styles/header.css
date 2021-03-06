@@ -1,0 +1,12 @@
+.form-inline-register {
+  margin-left: 20px;
+}
+
+#logout-button {
+  margin-left: 20px;
+}
+
+#logged-in-as {
+  color: white;
+  margin-bottom: 0px;
+}
