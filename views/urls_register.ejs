@@ -3,7 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
+    <link rel="stylesheet" href="../styles/header.css" type="text/css">
+    <link rel="stylesheet" href="../styles/register.css" type="text/css">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 
@@ -14,7 +15,7 @@
 
     <%- include('partials/_header') %>
 
-    <form class="form-inline" action="/register" method="POST">
+    <form id="register-form" class="form-inline" action="/register" method="POST">
       <h1>Create Account</h1>
       <div class="form-group mb-2">
         <input class="form-control" type="email" name="email" placeholder="username" style="width: 300px; margin: 1em">

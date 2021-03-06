@@ -17,12 +17,15 @@ module.exports = () => {
   //renders urls_new page
   router.get("/urls/new", (req, res) => {
     const user_id = req.session['user_id'];
-    if (typeof user_id === 'undefined') {
-      res.redirect('/login');
-    } else {
-      const templateVars = {user: user_id};
-      res.render("urls_new", templateVars);
-    }
+    const userLookup = User.find({ "id": user_id });
+    userLookup.exec().then((data) => {
+      if (data.length < 1) {
+        res.redirect('/login');
+      } else if (data.length > 0) {
+        const templateVars = { user: data[0] };
+        res.render("urls_new", templateVars);
+      }
+    });
   });
 
   //redirects user to longURL via hyperlink
@@ -37,13 +40,25 @@ module.exports = () => {
 
   //renders urls_show page displaying short and long urls
   router.get("/urls/:shortURL", (req, res) => {
-    const user = Url.find({"userID": req.session['user_id'], "shortURL": req.params.shortURL});
-    user.exec().then((data) => {
-      if (data.length > 0) {
-        const templateVars = { shortURL: req.params.shortURL, longURL: data[0].longURL, owner: true};
+    const userFind = User.aggregate([
+      {
+        $lookup:
+          {
+            from: "urls",
+            localField: "id",
+            foreignField: "userID",
+            as: "url_docs"
+          }
+      }
+    ]);
+    userFind.exec().then((data) => {
+      const url = data.filter(x => x['id'] === req.session['user_id'])[0].url_docs.filter(x => x.shortURL === req.params.shortURL)[0];
+      const userInfo = data.filter(x => x['id'] === req.session['user_id'])[0];
+      if (url) {
+        const templateVars = { shortURL: url.shortURL, longURL: url.longURL, user: userInfo, owner: true};
         res.render("urls_show", templateVars);
-      } else {
-        const templateVars = { shortURL: req.params.shortURL, longURL: data[0].longURL, owner: false};
+      } else if (url === undefined) {
+        const templateVars = { owner: false};
         res.render("urls_show", templateVars);
       }
     }).catch((err) => {
@@ -78,9 +93,7 @@ module.exports = () => {
         const templateVars = { urls: url, user: userInfo};
         res.render("urls_index", templateVars);
       });
-
     }
-
   });
 
   //deletes URL from database or returns error message if userID doesn't match
@@ -104,7 +117,6 @@ module.exports = () => {
   //after user inputs url into edit field, they are redirected to urls_show
   router.post("/urls/:id", (req, res) => {
     const user_id = req.session['user_id'];
-
     const urlEdit = Url.find({"userID": user_id, "shortURL": req.params.id});
     urlEdit.exec().then((data) => {
       if (data.length > 0) {
@@ -121,15 +133,11 @@ module.exports = () => {
   router.post("/urls", (req, res) => {
     const user_id = req.session['user_id'];
     const shortURL = generateRandomString();
-    // urlDatabase[shortURL] = createObj('longURL',req.body.longURL);
-    // urlDatabase[shortURL]['userID'] = user_id;
-
     const { longURL } = req.body;
     let urls = {};
     urls.shortURL = shortURL;
     urls.longURL = longURL;
     urls.userID = user_id;
-    
     let urlModel = new Url(urls);
     urlModel.save();
     res.redirect(`/urls/${shortURL}`);

@@ -1,15 +1,15 @@
-#register-form {
-  display: flex;
-  flex-direction: column;
+#login-form {
+  justify-content: center;
+  align-items: center;
   padding-top: 100px;
 }
 
-#register-form div {
+#login-form-form {
   display: flex;
   flex-direction: column;
 }
 
-#register-form div button{
+#login-form-form button{
   display: flex;
   flex-direction: column;
   margin-top: 20px;

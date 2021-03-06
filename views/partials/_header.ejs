@@ -12,21 +12,20 @@
     </div>
     <!--If user is not logged in-->
     <% if (typeof user === 'undefined') { %>
-      <form class="form-inline" action="/login">
+      <form class="form-inline-login" action="/login">
           <button type="submit" class="btn btn-primary">Login</button>
       </form>
-      <form class="form-inline" action="/register">
+      <form class="form-inline-register" action="/register">
         <button type="submit" class="btn btn-primary">Register</button>
-    </form>
+      </form>
       <% } else { %>
         <!--If user is logged in-->
         <form class="form-inline" action="/logout" method="POST">
           <div class="form-group mb-2">
-            <p>Logged in as: <%= user.email %></p>
-            <button type="submit" class="btn btn-primary">Logout</button>
+            <p id="logged-in-as">Welcome, <%= user.email %></p>
+            <button type="submit" class="btn btn-primary" id="logout-button">Logout</button>
           </div>
         </form>
-     
       <% } %>
   </nav>
 </header>

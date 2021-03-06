@@ -22,7 +22,7 @@ app.use(cookieSession({
 
 connectDB();
 
-
+app.use(express.static(__dirname + '/public'));
 app.use(express.json({extended: false}));
 // seperated routes
 const login = require("./routes/login");

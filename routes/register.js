@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { validate, generateRandomString, createObj, urlDatabase, users } = require('../helpers.js');
+const { validate, generateRandomString, createObj, urlDatabase } = require('../helpers.js');
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 
@@ -8,8 +8,7 @@ module.exports = () => {
   router.get("/register", (request, response) => {
     const user_id = request.session['user_id'];
     if (typeof user_id === 'undefined') {
-      const templateVars = { urls: urlDatabase };
-      response.render("urls_register", templateVars);
+      response.render("urls_register");
     } else {
       response.redirect('/urls');
     }
