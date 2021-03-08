@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const PORT = 8081; // default port 8080
+const PORT = process.env.PORT || 8081; // default port 8080
 const cookieSession = require('cookie-session');
 const connectDB = require('./db/Connection');
 const mongoose = require("mongoose");
