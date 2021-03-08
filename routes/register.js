@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const { validate, generateRandomString, createObj, urlDatabase } = require('../helpers.js');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 
 
