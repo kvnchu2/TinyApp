@@ -7,6 +7,8 @@ TinyApp is a full stack web application built with Node, Express, and MongoDB th
 1. Previously, the database was hardcoded, but I was able to replace it with mongoDB. 
 2. I added in error handling for the login and registration pages
 
+The app is deployed and you can visit it at this link: http://tiny-app-url.herokuapp.com/
+
 ## Final Product
 
 !["register-error"](https://github.com/kvnchu2/tinyapp/blob/master/docs/register-error.jpeg?raw=true)
